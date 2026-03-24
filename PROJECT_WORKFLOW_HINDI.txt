@@ -1,0 +1,226 @@
+CROWN FINANCE (Crown Finance) - WEBSITE PURI TARAH KAISE WORK KARTI HAI
+=====================================================================
+
+1) PROJECT KA HIGH-LEVEL FLOW
+-----------------------------
+Ye project 2 major parts me divided hai:
+
+A) Frontend (React + Vite)
+   Folder: frontend/
+   Kaam: UI dikhana, user input lena, backend API call karna.
+
+B) Backend (Django REST + MongoEngine)
+   Folder: backend/
+   Kaam: Authentication, business logic, data CRUD, ML/AI endpoints.
+
+C) Data Storage
+   - Main data MongoDB Atlas me store hota hai (users, accounts, transactions, budgets, goals, etc.).
+   - SQLite bhi Django ke default setup ke liye configured hai, lekin app ka transactional/domain data MongoEngine documents se MongoDB me handle ho raha hai.
+
+
+2) APP START HONE PAR KYA HOTA HAI
+----------------------------------
+Frontend side:
+- Entry file: frontend/src/main.jsx
+- Ye App component render karta hai (frontend/src/App.jsx).
+- App.jsx me React Router routes define hain:
+  /            -> Home page
+  /login       -> Login page
+  /signup      -> Signup page
+  /dashboard   -> Financial dashboard
+  /transactions, /accounts, /analytics, /reviews, /budgets, /debt,
+  /goals, /portfolio, /simulator, /help, /ai-insights, /scan
+
+Backend side:
+- Entry: backend/main.py (Django manage command run karta hai)
+- Main URL config: backend/item_service/urls.py
+  - /api/ route backend/api/urls.py me map hota hai.
+
+
+3) FRONTEND -> BACKEND CONNECTION
+---------------------------------
+- API base URL: frontend/src/lib/api.js
+  Default: http://localhost:8000/api
+
+Iska matlab frontend ka har data call usually is pattern ka hota hai:
+- ${API_BASE}/users/login/
+- ${API_BASE}/transactions/
+- ${API_BASE}/accounts/
+- ${API_BASE}/ml/...
+
+
+4) USER AUTH FLOW (SIGNUP + LOGIN)
+----------------------------------
+A) Signup:
+- Page: frontend/src/pages/Signup.jsx
+- User username, email, password fill karta hai.
+- Frontend POST request bhejta hai: /api/users/signup/
+- Backend SignupView user create karta hai.
+- Success par user ko login page par bheja jata hai.
+
+B) Login:
+- Page: frontend/src/pages/Login.jsx
+- Frontend POST request: /api/users/login/
+- Backend LoginView email/password verify karta hai.
+- Backend JWT token return karta hai.
+- Frontend token decode karta hai aur localStorage me store karta hai:
+  - accessToken
+  - userId
+  - username
+  - email
+- Login ke baad frontend user ke accounts fetch karta hai, first account ko selectedAccountId ke roop me localStorage me store karta hai.
+- Fir /dashboard navigate hota hai.
+
+
+5) SESSION / LOCAL STORAGE KA ROLE
+----------------------------------
+Frontend me localStorage central role play karta hai:
+- accessToken: authentication state
+- userId: data mapping ke liye
+- selectedAccountId: currently active account
+
+Kaafi pages isi stored values se data fetch karte hain.
+Example:
+- Dashboard accountId aur userId ke basis par data load karta hai.
+- Transactions page selectedAccountId ke basis par list dikhata hai.
+
+
+6) DASHBOARD FLOW
+-----------------
+Page: frontend/src/pages/Dashboard.jsx
+
+Dashboard load hote hi ye calls hoti hain:
+1. /api/accounts/{selectedAccountId}/
+   -> current account details
+2. /api/transactions/accounts/{selectedAccountId}
+   -> recent transactions
+3. /api/ml/anomalies/users/{userId}/
+   -> anomaly alerts
+
+Uske baad frontend income/expense/balance/savings rate calculate karta hai aur cards/charts me show karta hai.
+
+
+7) CORE MODULES KA DATA FLOW
+----------------------------
+A) Accounts
+- Endpoint examples:
+  GET/POST /api/accounts/
+  GET /api/accounts/{id}/
+  PUT /api/accounts/{id}/update/
+  DELETE /api/accounts/{id}/delete/
+
+B) Transactions
+- Page: frontend/src/pages/Transactions.jsx
+- Endpoint examples:
+  GET /api/transactions/accounts/{accountId}
+  POST /api/transactions/
+  PUT /api/transactions/{id}/update/
+  DELETE /api/transactions/{id}/delete/
+
+- Special feature: Receipt scanner logic se parsed data form me auto-fill hota hai, phir normal transaction create flow chalta hai.
+
+C) Budgets
+- Endpoint examples:
+  POST/GET /api/budgets/
+  GET /api/budgets/users/{user_id}/
+  GET /api/budgets/accounts/{account_id}/
+  GET/PUT/DELETE /api/budgets/{id}/
+
+D) Goals
+- Endpoint examples:
+  /api/goals/ aur /api/goals/{id}/
+
+E) Portfolio
+- Endpoint examples:
+  /api/portfolios/ aur /api/portfolios/{id}/
+
+F) Debts
+- Endpoint examples:
+  /api/debts/ aur /api/debts/{id}/
+
+G) Reviews & Contact
+- /api/review/
+- /api/contact/
+
+
+8) AI / ML FEATURES KAISE CHALTI HAIN
+-------------------------------------
+Page: frontend/src/pages/Aiinsights.jsx
+
+AI insights page userId ke basis par ML endpoints call karti hai:
+- GET /api/ml/predict-expense/{userId}/
+- POST /api/ml/anomalies/run/{userId}/
+- GET /api/ml/anomalies/users/{userId}/
+- POST /api/ml/recurring/run/{userId}/
+- GET /api/ml/recurring/users/{userId}/
+- GET /api/ml/goals/eta/{userId}/
+
+Result UI me forecast, anomaly cards, recurring patterns aur goal ETA ke form me show hota hai.
+
+
+9) BACKEND ARCHITECTURE (SIMPLE VIEW)
+-------------------------------------
+Main backend components:
+- URLs: backend/api/urls.py
+- Views/business logic: backend/api/views.py
+- Data models: backend/api/models.py
+- Serializers/validation: backend/api/serializers.py
+
+Models (MongoEngine) include:
+- User
+- Account
+- Transaction
+- Budget
+- Goal
+- Portfolio
+- Debt
+- Review
+- ContactMessage
+- MLPrediction, SpendingAnomaly, RecurringPattern
+- AIConversation, AISuggestion, FinancialInsight, UserPermission
+
+
+10) SECURITY & AUTH NOTE
+------------------------
+- Backend me REST Framework + JWT auth configured hai.
+- Login ke baad frontend token save karta hai aur user-specific data fetch karta hai.
+- Production ke liye token storage aur refresh flow ko aur harden kiya ja sakta hai (currently refresh endpoint available hai: /api/auth/refresh/).
+
+
+11) END-TO-END EXAMPLE (REAL USER JOURNEY)
+------------------------------------------
+Step 1: User signup karta hai -> account create.
+Step 2: User login karta hai -> JWT token milta hai.
+Step 3: Token decode hoke userId localStorage me save hota hai.
+Step 4: Default account select hota hai (selectedAccountId).
+Step 5: Dashboard account + transactions + anomalies fetch karta hai.
+Step 6: User transaction add/edit/delete karta hai -> backend DB update.
+Step 7: Budget/Goals/Portfolio/Debt pages respective endpoints se sync rahte hain.
+Step 8: AI Insights page ML APIs call karke predictive insights dikhata hai.
+
+
+12) LOCAL RUN QUICK REFERENCE
+-----------------------------
+Backend:
+- cd backend
+- pip install -r requirements.txt
+- python main.py runserver
+
+Frontend:
+- cd frontend
+- npm install
+- npm run dev
+
+Default URLs:
+- Frontend: http://localhost:5173 (ya Vite host port)
+- Backend API: http://localhost:8000/api
+
+
+13) IMPORTANT PRACTICAL NOTES
+-----------------------------
+- Workspace me project ki duplicate copy bhi hai (Crown Finance-main folder). Kaam karte waqt ensure karein ki aap same active root (Crown Finance-main_login) par run kar rahe ho.
+- Agar login ke baad koi data na aaye, pehle localStorage me userId/selectedAccountId check karein.
+- CORS settings backend/item_service/settings.py me env variables + DEBUG local origins se controlled hain.
+
+
+Yahi is website ka complete working overview hai: frontend UI -> API calls -> backend views/serializers -> MongoDB data -> response -> UI updates.
