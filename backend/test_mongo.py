@@ -19,7 +19,7 @@ except Exception as e:
         host = os.getenv("MONGODB_HOST")
         db_name = os.getenv("MONGODB_DATABASE_NAME")
 
-        MONGODB_URI = f"mongodb+srv://{username}:{password}@{host}/{db_name}?retryWrites=true&w=majority&appName=Crown Finance"
+        MONGODB_URI = f"mongodb+srv://{username}:{password}@{host}/{db_name}?retryWrites=true&w=majority&appName=MakeMy Finance"
 
         connect(
             db=db_name,

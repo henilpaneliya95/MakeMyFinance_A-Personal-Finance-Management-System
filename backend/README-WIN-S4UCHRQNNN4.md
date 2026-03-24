@@ -1,6 +1,6 @@
-# Crown Finance Backend
+# MakeMy Finance Backend
 
-This is the Django backend for the Crown Finance application, providing REST API endpoints for financial tracking and AI insights.
+This is the Django backend for the MakeMy Finance application, providing REST API endpoints for financial tracking and AI insights.
 
 ## Setup
 

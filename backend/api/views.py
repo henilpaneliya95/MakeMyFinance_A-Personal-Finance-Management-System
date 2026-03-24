@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 class APIRootView(APIView):
     def get(self, request):
         return Response({
-            'message': 'Welcome to Crown Finance API',
+            'message': 'Welcome to MakeMy Finance API',
             'endpoints': {
                 'auth': {
                     'signup': '/api/users/signup/',
@@ -1926,7 +1926,7 @@ class ContactMessageView(APIView):
             # Send email to admin with proper formatting
             admin_subject = f"New Contact Message: {contact.subject}"
             admin_message = f"""
-            New Contact Form Submission - Crown Finance
+            New Contact Form Submission - MakeMy Finance
             
             Contact Details:
             ----------------------------
@@ -1943,11 +1943,11 @@ class ContactMessageView(APIView):
             """
             
             # Confirmation email to user
-            user_subject = "Thank you for contacting Crown Finance"
+            user_subject = "Thank you for contacting MakeMy Finance"
             user_message = f"""
             Dear {contact.name},
             
-            Thank you for reaching out to Crown Finance. We have received your message and our team will get back to you shortly.
+            Thank you for reaching out to MakeMy Finance. We have received your message and our team will get back to you shortly.
             
             Here's a copy of your message for your reference:
             ----------------------------
@@ -1959,7 +1959,7 @@ class ContactMessageView(APIView):
             If you have any further questions, please don't hesitate to contact us.
             
             Best regards,
-            The Crown Finance Team
+            The MakeMy Finance Team
             """
             
             try:

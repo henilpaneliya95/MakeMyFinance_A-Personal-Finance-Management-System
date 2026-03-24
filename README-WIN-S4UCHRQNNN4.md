@@ -1,12 +1,12 @@
-# 💸 Crown Finance
+# 💸 MakeMy Finance
 
-**Crown Finance** is a full-stack AI-powered personal finance management application that helps users make smarter money decisions. The app enables users to track expenses, income, savings, financial goals, and receive smart AI-based financial insights.
+**MakeMy Finance** is a full-stack AI-powered personal finance management application that helps users make smarter money decisions. The app enables users to track expenses, income, savings, financial goals, and receive smart AI-based financial insights.
 
 ---
 
 ## 📁 Project Structure
 
-CrownFinance/
+MakeMyFinance/
 ├── .venv/ # Python virtual environment (ignored)
 ├── frontend/ # React.js (or Vite) frontend with Tailwind CSS & Shadcn/ui
 ├── backend/ # Python backend (Django or FastAPI)
@@ -54,6 +54,6 @@ CrownFinance/
 ### 🧩 Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/CrownFinance.git
-cd CrownFinance
+git clone https://github.com/your-username/MakeMyFinance.git
+cd MakeMyFinance
 

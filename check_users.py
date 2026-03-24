@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.insert(0, 'D:\\Crown Finance-main\\backend')
+sys.path.insert(0, 'D:\\MakeMy Finance-main\\backend')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'item_service.settings')
 
 import django

@@ -22,7 +22,7 @@ password = quote_plus(os.getenv('MONGODB_PASS'))
 host = os.getenv('MONGODB_HOST')
 db_name = os.getenv('MONGODB_DATABASE_NAME')
 
-MONGODB_URI = f'mongodb+srv://{username}:{password}@{host}/{db_name}?retryWrites=true&w=majority&appName=CrownFinance'
+MONGODB_URI = f'mongodb+srv://{username}:{password}@{host}/{db_name}?retryWrites=true&w=majority&appName=MakeMyFinance'
 print(f'Full URI: {MONGODB_URI}')
 
 try:

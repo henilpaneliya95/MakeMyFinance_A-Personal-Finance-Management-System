@@ -1,8 +1,8 @@
-# Crown Finance Authentication + OTP (Production Adapted)
+# MakeMy Finance Authentication + OTP (Production Adapted)
 
 ## 1. Architecture (Adaptive to Existing Stack)
 
-- Project: Crown Finance
+- Project: MakeMy Finance
 - Frontend: React + Vite (`frontend`)
 - Backend: Django REST Framework + MongoEngine (`backend`)
 - Database: MongoDB (Atlas via MongoEngine for app documents), SQLite for Django internal apps

@@ -212,7 +212,7 @@ password = quote_plus(os.getenv("MONGODB_PASS"))  # encode special chars (@, #, 
 host = os.getenv("MONGODB_HOST")
 db_name = os.getenv("MONGODB_DATABASE_NAME")
 
-MONGODB_URI = f"mongodb+srv://{username}:{password}@{host}/{db_name}?retryWrites=true&w=majority&appName=Crown Finance"
+MONGODB_URI = f"mongodb+srv://{username}:{password}@{host}/{db_name}?retryWrites=true&w=majority&appName=MakeMy Finance"
 
 try:
     connect(
@@ -285,7 +285,7 @@ REST_FRAMEWORK = {
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "LOCATION": "crown-finance-auth",
+        "LOCATION": "makemy-finance-auth",
     }
 }
 

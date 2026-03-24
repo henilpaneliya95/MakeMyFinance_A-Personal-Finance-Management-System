@@ -1,4 +1,4 @@
-CROWN FINANCE (Crown Finance) - WEBSITE PURI TARAH KAISE WORK KARTI HAI
+MAKEMY FINANCE (MakeMy Finance) - WEBSITE PURI TARAH KAISE WORK KARTI HAI
 =====================================================================
 
 1) PROJECT KA HIGH-LEVEL FLOW
@@ -218,7 +218,7 @@ Default URLs:
 
 13) IMPORTANT PRACTICAL NOTES
 -----------------------------
-- Workspace me project ki duplicate copy bhi hai (Crown Finance-main folder). Kaam karte waqt ensure karein ki aap same active root (Crown Finance-main_login) par run kar rahe ho.
+- Workspace me project ki duplicate copy bhi hai (MakeMy Finance-main folder). Kaam karte waqt ensure karein ki aap same active root (MakeMy Finance-main_login) par run kar rahe ho.
 - Agar login ke baad koi data na aaye, pehle localStorage me userId/selectedAccountId check karein.
 - CORS settings backend/item_service/settings.py me env variables + DEBUG local origins se controlled hain.
 
