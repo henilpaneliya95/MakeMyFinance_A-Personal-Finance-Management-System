@@ -30,7 +30,7 @@ class SignupSerializer(serializers.Serializer):
             username=validated_data['username'].strip(),
             email=validated_data['email'].strip().lower()  # Normalize email
         )
-        # Password को strip करके hash करो ताकि spaces issue न हो
+        # Strip password before hashing to avoid whitespace-related login issues.
         password = validated_data['password'].strip()
         user.set_password(password)
         user.save()

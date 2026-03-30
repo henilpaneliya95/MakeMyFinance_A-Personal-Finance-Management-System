@@ -8,9 +8,9 @@ django.setup()
 
 from api.models import User
 
-# अंतिम 3 users को देखें
+# Show the latest users
 print("=" * 70)
-print("📊 DATABASE में USERS")
+print("DATABASE USERS")
 print("=" * 70)
 
 users = User.objects.all().order_by('-id')[:5]

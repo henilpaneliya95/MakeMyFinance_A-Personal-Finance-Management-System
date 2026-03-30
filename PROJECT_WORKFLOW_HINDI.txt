@@ -1,29 +1,29 @@
-MAKEMY FINANCE (MakeMy Finance) - WEBSITE PURI TARAH KAISE WORK KARTI HAI
-=====================================================================
+MAKEMY FINANCE (MakeMy Finance) - COMPLETE WEBSITE WORKFLOW
+============================================================
 
-1) PROJECT KA HIGH-LEVEL FLOW
------------------------------
-Ye project 2 major parts me divided hai:
+1) HIGH-LEVEL PROJECT FLOW
+--------------------------
+This project is divided into two major parts:
 
 A) Frontend (React + Vite)
    Folder: frontend/
-   Kaam: UI dikhana, user input lena, backend API call karna.
+   Purpose: Render the UI, collect user input, and call backend APIs.
 
 B) Backend (Django REST + MongoEngine)
    Folder: backend/
-   Kaam: Authentication, business logic, data CRUD, ML/AI endpoints.
+   Purpose: Authentication, business logic, CRUD operations, and ML/AI endpoints.
 
 C) Data Storage
-   - Main data MongoDB Atlas me store hota hai (users, accounts, transactions, budgets, goals, etc.).
-   - SQLite bhi Django ke default setup ke liye configured hai, lekin app ka transactional/domain data MongoEngine documents se MongoDB me handle ho raha hai.
+   - Primary data is stored in MongoDB Atlas (users, accounts, transactions, budgets, goals, and more).
+   - SQLite is configured for Django defaults, but the app's domain and transactional data is handled through MongoEngine documents in MongoDB.
 
 
-2) APP START HONE PAR KYA HOTA HAI
-----------------------------------
+2) WHAT HAPPENS WHEN THE APP STARTS
+------------------------------------
 Frontend side:
 - Entry file: frontend/src/main.jsx
-- Ye App component render karta hai (frontend/src/App.jsx).
-- App.jsx me React Router routes define hain:
+- It renders the App component (frontend/src/App.jsx).
+- Routes are defined in App.jsx using React Router:
   /            -> Home page
   /login       -> Login page
   /signup      -> Signup page
@@ -32,9 +32,9 @@ Frontend side:
   /goals, /portfolio, /simulator, /help, /ai-insights, /scan
 
 Backend side:
-- Entry: backend/main.py (Django manage command run karta hai)
+- Entry point: backend/main.py (runs Django manage commands)
 - Main URL config: backend/item_service/urls.py
-  - /api/ route backend/api/urls.py me map hota hai.
+  - The /api/ route is mapped to backend/api/urls.py
 
 
 3) FRONTEND -> BACKEND CONNECTION
@@ -42,7 +42,7 @@ Backend side:
 - API base URL: frontend/src/lib/api.js
   Default: http://localhost:8000/api
 
-Iska matlab frontend ka har data call usually is pattern ka hota hai:
+This means frontend data calls usually follow this pattern:
 - ${API_BASE}/users/login/
 - ${API_BASE}/transactions/
 - ${API_BASE}/accounts/
@@ -53,43 +53,43 @@ Iska matlab frontend ka har data call usually is pattern ka hota hai:
 ----------------------------------
 A) Signup:
 - Page: frontend/src/pages/Signup.jsx
-- User username, email, password fill karta hai.
-- Frontend POST request bhejta hai: /api/users/signup/
-- Backend SignupView user create karta hai.
-- Success par user ko login page par bheja jata hai.
+- The user enters username, email, and password.
+- Frontend sends a POST request to: /api/users/signup/
+- Backend SignupView creates the user.
+- On success, the user is redirected to the login page.
 
 B) Login:
 - Page: frontend/src/pages/Login.jsx
-- Frontend POST request: /api/users/login/
-- Backend LoginView email/password verify karta hai.
-- Backend JWT token return karta hai.
-- Frontend token decode karta hai aur localStorage me store karta hai:
+- Frontend sends a POST request to: /api/users/login/
+- Backend LoginView verifies email and password.
+- Backend returns a JWT token.
+- Frontend decodes the token and stores in localStorage:
   - accessToken
   - userId
   - username
   - email
-- Login ke baad frontend user ke accounts fetch karta hai, first account ko selectedAccountId ke roop me localStorage me store karta hai.
-- Fir /dashboard navigate hota hai.
+- After login, frontend fetches user accounts and stores the first account as selectedAccountId in localStorage.
+- Then it navigates to /dashboard.
 
 
-5) SESSION / LOCAL STORAGE KA ROLE
+5) ROLE OF SESSION / LOCAL STORAGE
 ----------------------------------
-Frontend me localStorage central role play karta hai:
+localStorage plays a central role in the frontend:
 - accessToken: authentication state
-- userId: data mapping ke liye
+- userId: mapping data to the current user
 - selectedAccountId: currently active account
 
-Kaafi pages isi stored values se data fetch karte hain.
+Many pages fetch data using these stored values.
 Example:
-- Dashboard accountId aur userId ke basis par data load karta hai.
-- Transactions page selectedAccountId ke basis par list dikhata hai.
+- Dashboard loads data using accountId and userId.
+- Transactions page shows data based on selectedAccountId.
 
 
 6) DASHBOARD FLOW
 -----------------
 Page: frontend/src/pages/Dashboard.jsx
 
-Dashboard load hote hi ye calls hoti hain:
+When Dashboard loads, these calls run:
 1. /api/accounts/{selectedAccountId}/
    -> current account details
 2. /api/transactions/accounts/{selectedAccountId}
@@ -97,11 +97,11 @@ Dashboard load hote hi ye calls hoti hain:
 3. /api/ml/anomalies/users/{userId}/
    -> anomaly alerts
 
-Uske baad frontend income/expense/balance/savings rate calculate karta hai aur cards/charts me show karta hai.
+Then the frontend calculates income, expenses, balance, and savings rate, and shows them in cards/charts.
 
 
-7) CORE MODULES KA DATA FLOW
-----------------------------
+7) CORE MODULE DATA FLOW
+------------------------
 A) Accounts
 - Endpoint examples:
   GET/POST /api/accounts/
@@ -117,7 +117,7 @@ B) Transactions
   PUT /api/transactions/{id}/update/
   DELETE /api/transactions/{id}/delete/
 
-- Special feature: Receipt scanner logic se parsed data form me auto-fill hota hai, phir normal transaction create flow chalta hai.
+- Special feature: Receipt scanner logic parses input data, auto-fills the form, and then follows the normal transaction creation flow.
 
 C) Budgets
 - Endpoint examples:
@@ -128,26 +128,26 @@ C) Budgets
 
 D) Goals
 - Endpoint examples:
-  /api/goals/ aur /api/goals/{id}/
+  /api/goals/ and /api/goals/{id}/
 
 E) Portfolio
 - Endpoint examples:
-  /api/portfolios/ aur /api/portfolios/{id}/
+  /api/portfolios/ and /api/portfolios/{id}/
 
 F) Debts
 - Endpoint examples:
-  /api/debts/ aur /api/debts/{id}/
+  /api/debts/ and /api/debts/{id}/
 
 G) Reviews & Contact
 - /api/review/
 - /api/contact/
 
 
-8) AI / ML FEATURES KAISE CHALTI HAIN
--------------------------------------
+8) HOW AI / ML FEATURES WORK
+----------------------------
 Page: frontend/src/pages/Aiinsights.jsx
 
-AI insights page userId ke basis par ML endpoints call karti hai:
+The AI Insights page calls ML endpoints based on userId:
 - GET /api/ml/predict-expense/{userId}/
 - POST /api/ml/anomalies/run/{userId}/
 - GET /api/ml/anomalies/users/{userId}/
@@ -155,7 +155,7 @@ AI insights page userId ke basis par ML endpoints call karti hai:
 - GET /api/ml/recurring/users/{userId}/
 - GET /api/ml/goals/eta/{userId}/
 
-Result UI me forecast, anomaly cards, recurring patterns aur goal ETA ke form me show hota hai.
+Results are shown in the UI as forecasts, anomaly cards, recurring patterns, and goal ETA insights.
 
 
 9) BACKEND ARCHITECTURE (SIMPLE VIEW)
@@ -166,7 +166,7 @@ Main backend components:
 - Data models: backend/api/models.py
 - Serializers/validation: backend/api/serializers.py
 
-Models (MongoEngine) include:
+MongoEngine models include:
 - User
 - Account
 - Transaction
@@ -180,23 +180,23 @@ Models (MongoEngine) include:
 - AIConversation, AISuggestion, FinancialInsight, UserPermission
 
 
-10) SECURITY & AUTH NOTE
-------------------------
-- Backend me REST Framework + JWT auth configured hai.
-- Login ke baad frontend token save karta hai aur user-specific data fetch karta hai.
-- Production ke liye token storage aur refresh flow ko aur harden kiya ja sakta hai (currently refresh endpoint available hai: /api/auth/refresh/).
+10) SECURITY & AUTH NOTES
+-------------------------
+- Backend uses REST Framework with JWT authentication.
+- After login, frontend stores the token and fetches user-specific data.
+- For production, token storage and refresh flow can be hardened further (refresh endpoint is available at: /api/auth/refresh/).
 
 
 11) END-TO-END EXAMPLE (REAL USER JOURNEY)
 ------------------------------------------
-Step 1: User signup karta hai -> account create.
-Step 2: User login karta hai -> JWT token milta hai.
-Step 3: Token decode hoke userId localStorage me save hota hai.
-Step 4: Default account select hota hai (selectedAccountId).
-Step 5: Dashboard account + transactions + anomalies fetch karta hai.
-Step 6: User transaction add/edit/delete karta hai -> backend DB update.
-Step 7: Budget/Goals/Portfolio/Debt pages respective endpoints se sync rahte hain.
-Step 8: AI Insights page ML APIs call karke predictive insights dikhata hai.
+Step 1: User signs up -> account is created.
+Step 2: User logs in -> JWT token is returned.
+Step 3: Token is decoded and userId is stored in localStorage.
+Step 4: A default account is selected (selectedAccountId).
+Step 5: Dashboard fetches account + transactions + anomalies.
+Step 6: User adds/edits/deletes transactions -> backend DB updates.
+Step 7: Budget/Goals/Portfolio/Debt pages stay synced through their endpoints.
+Step 8: AI Insights page calls ML APIs and displays predictive insights.
 
 
 12) LOCAL RUN QUICK REFERENCE
@@ -212,15 +212,15 @@ Frontend:
 - npm run dev
 
 Default URLs:
-- Frontend: http://localhost:5173 (ya Vite host port)
+- Frontend: http://localhost:5173 (or the Vite host port)
 - Backend API: http://localhost:8000/api
 
 
 13) IMPORTANT PRACTICAL NOTES
 -----------------------------
-- Workspace me project ki duplicate copy bhi hai (MakeMy Finance-main folder). Kaam karte waqt ensure karein ki aap same active root (MakeMy Finance-main_login) par run kar rahe ho.
-- Agar login ke baad koi data na aaye, pehle localStorage me userId/selectedAccountId check karein.
-- CORS settings backend/item_service/settings.py me env variables + DEBUG local origins se controlled hain.
+- A duplicate project copy may exist in the workspace. While running commands, make sure you are in the correct active root.
+- If no data appears after login, first check userId/selectedAccountId in localStorage.
+- CORS settings are controlled in backend/item_service/settings.py via environment variables and DEBUG local origins.
 
 
-Yahi is website ka complete working overview hai: frontend UI -> API calls -> backend views/serializers -> MongoDB data -> response -> UI updates.
+This is the complete working overview: frontend UI -> API calls -> backend views/serializers -> MongoDB data -> response -> UI updates.
