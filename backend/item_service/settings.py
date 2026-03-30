@@ -142,7 +142,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret")
 
-ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "").split(",") if host.strip()]
+
+def _csv_env(name):
+    return [value.strip() for value in os.getenv(name, "").split(",") if value.strip()]
+
+ALLOWED_HOSTS = _csv_env("ALLOWED_HOSTS")
 if not ALLOWED_HOSTS:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
@@ -259,8 +263,26 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # -----------------------------
 # ✅ CORS (Frontend access)
 # -----------------------------
-CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if os.getenv("CORS_ALLOWED_ORIGINS") else []
-CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if os.getenv("CSRF_TRUSTED_ORIGINS") else []
+CORS_ALLOWED_ORIGINS = _csv_env("CORS_ALLOWED_ORIGINS")
+CSRF_TRUSTED_ORIGINS = _csv_env("CSRF_TRUSTED_ORIGINS")
+CORS_ALLOWED_ORIGIN_REGEXES = _csv_env("CORS_ALLOWED_ORIGIN_REGEXES")
+
+if not DEBUG:
+    default_prod_origins = [
+        "https://www.makemyfinance.online",
+        "https://makemyfinance.online",
+        "https://make-my-finance-a-personal-finance.vercel.app",
+    ]
+    for origin in default_prod_origins:
+        if origin not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(origin)
+        if origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(origin)
+
+    default_prod_hosts = ["www.makemyfinance.online", "makemyfinance.online"]
+    for host in default_prod_hosts:
+        if host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(host)
 
 render_external_url = os.getenv("RENDER_EXTERNAL_URL", "").strip()
 if render_external_url:

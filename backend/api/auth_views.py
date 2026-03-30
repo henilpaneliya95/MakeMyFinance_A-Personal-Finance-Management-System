@@ -42,12 +42,18 @@ class RegisterWithOTPView(APIView):
                 status=status.HTTP_429_TOO_MANY_REQUESTS,
             )
 
-        sent, error_msg, user = request_registration_otp(
-            username=serializer.validated_data["username"],
-            email=email,
-            password=serializer.validated_data["password"],
-            role=serializer.validated_data.get("role", "user"),
-        )
+        try:
+            sent, error_msg, user = request_registration_otp(
+                username=serializer.validated_data["username"],
+                email=email,
+                password=serializer.validated_data["password"],
+                role=serializer.validated_data.get("role", "user"),
+            )
+        except Exception as exc:
+            return Response(
+                {"message": f"Registration failed: {str(exc)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
         if not sent:
             response_message = error_msg or "Unable to send OTP. Please try again."
