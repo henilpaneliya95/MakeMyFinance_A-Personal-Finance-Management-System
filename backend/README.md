@@ -43,6 +43,23 @@ python main.py runserver
 
 The server will start on `http://127.0.0.1:8000` by default.
 
+## Production (Render)
+
+This repository includes deployment configuration for Render:
+
+- `../render.yaml` for service root/build/start commands
+- `runtime.txt` to pin Python version (`3.11.11`)
+
+Important production env vars:
+
+- `SECRET_KEY`
+- `DEBUG=False`
+- `ALLOWED_HOSTS` (include your `.onrender.com` domain)
+- `RENDER_EXTERNAL_URL` (full HTTPS URL of your Render service)
+- `MONGODB_USER`, `MONGODB_PASS`, `MONGODB_HOST`, `MONGODB_DATABASE_NAME`
+- `AUTH_REQUIRE_LOGIN_OTP=True` (if you want OTP on every login)
+- SMTP vars (`EMAIL_BACKEND`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `SMTP_FROM_EMAIL`)
+
 ## API Endpoints
 
 - `/api/` - Main API routes

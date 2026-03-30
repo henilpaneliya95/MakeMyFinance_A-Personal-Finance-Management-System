@@ -135,11 +135,16 @@ from pathlib import Path
 from mongoengine import connect
 from dotenv import load_dotenv
 import os
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlparse
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret")
+
+ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "").split(",") if host.strip()]
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 
 # -----------------------------
@@ -257,6 +262,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if os.getenv("CORS_ALLOWED_ORIGINS") else []
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if os.getenv("CSRF_TRUSTED_ORIGINS") else []
 
+render_external_url = os.getenv("RENDER_EXTERNAL_URL", "").strip()
+if render_external_url:
+    parsed = urlparse(render_external_url)
+    render_host = parsed.hostname
+    if render_host and render_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(render_host)
+
+    if render_external_url not in CORS_ALLOWED_ORIGINS:
+        CORS_ALLOWED_ORIGINS.append(render_external_url)
+
+    if render_external_url not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(render_external_url)
+
 # During local development, include common Vite ports so the frontend at
 # localhost:5173 or localhost:5175 can reach this API without CORS errors.
 if DEBUG:
@@ -272,6 +290,11 @@ if DEBUG:
 
 # Allow credentials (cookies, auth headers) over CORS if needed by the frontend
 CORS_ALLOW_CREDENTIALS = True
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 # -----------------------------
 # ✅ REST Framework Settings
@@ -315,8 +338,4 @@ AUTH_RATE_LIMIT_WINDOW_SECONDS = int(os.getenv('AUTH_RATE_LIMIT_WINDOW_SECONDS',
 AUTH_RATE_LIMIT_IP_MAX = int(os.getenv('AUTH_RATE_LIMIT_IP_MAX', '25'))
 AUTH_RATE_LIMIT_EMAIL_MAX = int(os.getenv('AUTH_RATE_LIMIT_EMAIL_MAX', '8'))
 AUTH_REQUIRE_LOGIN_OTP = os.getenv('AUTH_REQUIRE_LOGIN_OTP', 'false').lower() == 'true'
-
-
-SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.56.1', '10.76.55.108'] if not DEBUG else []
