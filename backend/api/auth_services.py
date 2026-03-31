@@ -124,6 +124,12 @@ def request_registration_otp(username, email, password, role="user"):
     if existing and existing.email_verified:
         return False, "An account with this email already exists.", None
 
+    otp_code, expiry_minutes = _create_otp(email, "registration")
+    sent, error_msg = send_otp_email(email, otp_code, "registration", expiry_minutes)
+
+    if not sent:
+        return False, error_msg, None
+
     if existing:
         existing.username = username.strip()
         existing.role = (role or "user").strip().lower() or "user"
@@ -144,8 +150,6 @@ def request_registration_otp(username, email, password, role="user"):
         user.set_password(password)
         user.save()
 
-    otp_code, expiry_minutes = _create_otp(email, "registration")
-    sent, error_msg = send_otp_email(email, otp_code, "registration", expiry_minutes)
     return sent, error_msg, user
 
 

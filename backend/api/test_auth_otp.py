@@ -250,3 +250,19 @@ class AuthLoginOTPRequiredTests(TestCase):
         )
         self.assertEqual(verify_login_res.status_code, 200)
         self.assertIn("access_token", verify_login_res.data)
+
+    @patch("api.auth_services.send_otp_email", return_value=(False, "SMTP down"))
+    @patch("api.auth_services._generate_numeric_otp", return_value="999999")
+    def test_registration_does_not_create_user_when_otp_send_fails(self, _otp_mock, _mail_mock):
+        register_res = self.client.post(
+            "/api/auth/register/",
+            {
+                "username": "otpfail",
+                "email": "otpfail@example.com",
+                "password": "VeryStrongPass123!",
+            },
+            format="json",
+        )
+
+        self.assertEqual(register_res.status_code, 503)
+        self.assertEqual(User.objects(email__iexact="otpfail@example.com").count(), 0)
