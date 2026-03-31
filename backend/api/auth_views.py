@@ -164,7 +164,14 @@ class LoginWithOTPView(APIView):
                     },
                     status=status.HTTP_200_OK,
                 )
-            return Response({"message": result.get("error")}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {
+                    "message": result.get("error") or "Invalid email or password.",
+                    "auth_error": True,
+                    "requires_otp": False,
+                },
+                status=status.HTTP_200_OK,
+            )
 
         user = result.get("user")
         if result.get("requires_otp"):

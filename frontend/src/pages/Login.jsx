@@ -56,6 +56,11 @@ const Login = () => {
         return;
       }
 
+      if (data.auth_error) {
+        setError(data.message || "Invalid credentials. Please try again.");
+        return;
+      }
+
       storeSessionAndNavigate(data);
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials. Please try again.");

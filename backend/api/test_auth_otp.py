@@ -266,3 +266,17 @@ class AuthLoginOTPRequiredTests(TestCase):
 
         self.assertEqual(register_res.status_code, 503)
         self.assertEqual(User.objects(email__iexact="otpfail@example.com").count(), 0)
+
+    def test_invalid_login_returns_handled_auth_error_payload(self):
+        login_res = self.client.post(
+            "/api/auth/login/",
+            {
+                "email": "doesnotexist@example.com",
+                "password": "WrongPass123!",
+            },
+            format="json",
+        )
+
+        self.assertEqual(login_res.status_code, 200)
+        self.assertTrue(login_res.data.get("auth_error"))
+        self.assertFalse(login_res.data.get("requires_otp"))
