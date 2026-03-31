@@ -165,6 +165,8 @@ function App() {
             </Layout>
           }
         />
+
+        <Route path="*" element={<HomePage />} />
       </Routes>
     </Router>
   );
