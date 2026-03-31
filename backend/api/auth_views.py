@@ -58,7 +58,14 @@ class RegisterWithOTPView(APIView):
         if not sent:
             response_message = error_msg or "Unable to send OTP. Please try again."
             if response_message.startswith("An account with this email"):
-                return Response({"message": response_message}, status=status.HTTP_409_CONFLICT)
+                return Response(
+                    {
+                        "message": "Account already exists. Please login instead.",
+                        "requires_otp": False,
+                        "existing_account": True,
+                    },
+                    status=status.HTTP_200_OK,
+                )
 
             # If SMTP is unavailable in production, allow registration to proceed
             # to avoid hard signup outages caused by transient email infra issues.
