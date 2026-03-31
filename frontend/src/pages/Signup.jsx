@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE } from "@/lib/api";
-import { savePendingFlow } from "@/utils/authFlow";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -60,28 +59,24 @@ const Signup = () => {
         password: form.password,
       };
 
-      const res = await axios.post(`${API_BASE}/auth/register/`, payload);
-      if (res.data?.requires_otp) {
-        savePendingFlow("registration", {
-          email: payload.email,
-          purpose: "registration",
-          createdAt: Date.now(),
-        });
-        navigate(`/verify-otp?purpose=registration&email=${encodeURIComponent(payload.email)}`);
-        return;
-      }
+      // Use stable legacy auth routes in production to avoid OTP email infra outages.
+      await axios.post(`${API_BASE}/users/signup/`, payload);
+      const loginRes = await axios.post(`${API_BASE}/users/login/`, {
+        email: payload.email,
+        password: payload.password,
+      });
 
-      if (res.data?.access_token && res.data?.user) {
-        localStorage.setItem("accessToken", res.data.access_token || res.data.token);
-        localStorage.setItem("userId", res.data.user.id);
-        localStorage.setItem("username", res.data.user.username);
-        localStorage.setItem("email", res.data.user.email);
+      if (loginRes.data?.token) {
+        localStorage.setItem("accessToken", loginRes.data.token);
+        localStorage.setItem("username", loginRes.data.username || payload.username);
+        localStorage.setItem("email", loginRes.data.email || payload.email);
+        localStorage.removeItem("userId");
         navigate("/dashboard");
         window.setTimeout(() => window.location.reload(), 50);
         return;
       }
 
-      setErrors({ submit: "Unexpected response from server." });
+      setErrors({ submit: "Signup completed, but auto-login failed. Please login manually." });
     } catch (err) {
       setErrors({
         submit: err.response?.data?.message || "Signup failed. Please try again.",
