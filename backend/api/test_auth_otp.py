@@ -165,3 +165,88 @@ class AuthOTPTests(TestCase):
         token = issue_access_token(user)
         self.assertIsInstance(token, str)
         self.assertEqual(token.count("."), 2)
+
+
+@override_settings(
+    AUTH_OTP_LENGTH=6,
+    AUTH_OTP_EXPIRY_MINUTES=10,
+    AUTH_OTP_MAX_ATTEMPTS=5,
+    AUTH_REQUIRE_LOGIN_OTP=True,
+)
+class AuthLoginOTPRequiredTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        try:
+            disconnect(alias="default")
+        except Exception:
+            pass
+        connect(
+            "crown_finance_test",
+            alias="default",
+            host="mongodb://localhost",
+            mongo_client_class=mongomock.MongoClient,
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        try:
+            disconnect(alias="default")
+        except Exception:
+            pass
+        super().tearDownClass()
+
+    def setUp(self):
+        self.client = APIClient()
+        User.drop_collection()
+        OTPVerification.drop_collection()
+
+    @patch("api.auth_services.send_otp_email", return_value=(True, None))
+    @patch("api.auth_services._generate_numeric_otp", side_effect=["123456", "654321"])
+    def test_login_requires_otp_before_token(self, _otp_mock, _mail_mock):
+        register_res = self.client.post(
+            "/api/auth/register/",
+            {
+                "username": "otpuser",
+                "email": "otpuser@example.com",
+                "password": "VeryStrongPass123!",
+            },
+            format="json",
+        )
+        self.assertEqual(register_res.status_code, 201)
+        self.assertTrue(register_res.data["requires_otp"])
+
+        verify_registration_res = self.client.post(
+            "/api/auth/verify-otp/",
+            {
+                "email": "otpuser@example.com",
+                "otp": "123456",
+                "purpose": "registration",
+            },
+            format="json",
+        )
+        self.assertEqual(verify_registration_res.status_code, 200)
+
+        login_res = self.client.post(
+            "/api/auth/login/",
+            {
+                "email": "otpuser@example.com",
+                "password": "VeryStrongPass123!",
+            },
+            format="json",
+        )
+        self.assertEqual(login_res.status_code, 200)
+        self.assertTrue(login_res.data["requires_otp"])
+        self.assertEqual(login_res.data["purpose"], "login")
+        self.assertNotIn("access_token", login_res.data)
+
+        verify_login_res = self.client.post(
+            "/api/auth/verify-login-otp/",
+            {
+                "email": "otpuser@example.com",
+                "otp": "654321",
+            },
+            format="json",
+        )
+        self.assertEqual(verify_login_res.status_code, 200)
+        self.assertIn("access_token", verify_login_res.data)
