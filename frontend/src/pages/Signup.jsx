@@ -22,6 +22,7 @@ const Signup = () => {
 
   const validateForm = () => {
     const newErrors = {};
+    const password = form.password || "";
 
     if (!form.username.trim()) {
       newErrors.username = "Username is required";
@@ -35,10 +36,18 @@ const Signup = () => {
       newErrors.email = "Email is invalid";
     }
 
-    if (!form.password) {
+    if (!password) {
       newErrors.password = "Password is required";
-    } else if (form.password.length < 8) {
+    } else if (password.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
+    } else if (!/[A-Z]/.test(password)) {
+      newErrors.password = "Password must contain at least one uppercase letter";
+    } else if (!/[a-z]/.test(password)) {
+      newErrors.password = "Password must contain at least one lowercase letter";
+    } else if (!/[0-9]/.test(password)) {
+      newErrors.password = "Password must contain at least one number";
+    } else if (!/[^A-Za-z0-9]/.test(password)) {
+      newErrors.password = "Password must contain at least one special character";
     }
 
     setErrors(newErrors);
@@ -85,6 +94,34 @@ const Signup = () => {
 
       setErrors({ submit: "Unexpected response from server." });
     } catch (err) {
+      const data = err.response?.data;
+      if (data && typeof data === "object") {
+        const nextErrors = {};
+
+        if (Array.isArray(data.username) && data.username[0]) {
+          nextErrors.username = data.username[0];
+        }
+        if (Array.isArray(data.email) && data.email[0]) {
+          nextErrors.email = data.email[0];
+        }
+        if (Array.isArray(data.password) && data.password[0]) {
+          nextErrors.password = data.password[0];
+        }
+        if (Array.isArray(data.non_field_errors) && data.non_field_errors[0]) {
+          nextErrors.submit = data.non_field_errors[0];
+        }
+        if (typeof data.message === "string") {
+          nextErrors.submit = data.message;
+        }
+
+        if (!nextErrors.submit && Object.keys(nextErrors).length === 0) {
+          nextErrors.submit = "Signup failed. Please check your details and try again.";
+        }
+
+        setErrors(nextErrors);
+        return;
+      }
+
       setErrors({
         submit: err.response?.data?.message || "Signup failed. Please try again.",
       });
