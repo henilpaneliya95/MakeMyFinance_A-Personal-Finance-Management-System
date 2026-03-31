@@ -20,3 +20,5 @@ services:
         value: https://www.makemyfinance.online,https://makemyfinance.online
       - key: EMAIL_TIMEOUT
         value: "8"
+      - key: AUTH_REQUIRE_LOGIN_OTP
+        value: "True"

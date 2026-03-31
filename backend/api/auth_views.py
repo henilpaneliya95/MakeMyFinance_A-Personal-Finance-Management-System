@@ -67,29 +67,16 @@ class RegisterWithOTPView(APIView):
                     status=status.HTTP_200_OK,
                 )
 
-            # If SMTP is unavailable in production, allow registration to proceed
-            # to avoid hard signup outages caused by transient email infra issues.
+            # OTP flow is mandatory for registration; if email delivery fails,
+            # return a clear error instead of bypassing verification.
             lowered = response_message.lower()
             if "network is unreachable" in lowered or "email service is not configured" in lowered:
-                user.email_verified = True
-                user.updated_at = datetime.now(timezone.utc)
-                user.save()
-                token = issue_access_token(user)
                 return Response(
                     {
-                        "message": "Account created. OTP service is temporarily unavailable.",
+                        "message": "OTP service is currently unavailable. Please try again in a moment.",
                         "requires_otp": False,
-                        "access_token": token,
-                        "token": token,
-                        "user": {
-                            "id": str(user.id),
-                            "username": user.username,
-                            "email": user.email,
-                            "role": user.role,
-                            "email_verified": user.email_verified,
-                        },
                     },
-                    status=status.HTTP_201_CREATED,
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 )
 
             return Response({"message": response_message}, status=status.HTTP_503_SERVICE_UNAVAILABLE)

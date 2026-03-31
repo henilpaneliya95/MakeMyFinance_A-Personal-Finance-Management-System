@@ -73,17 +73,13 @@ const Signup = () => {
       }
 
       if (res.data?.access_token && res.data?.user) {
-        localStorage.setItem("accessToken", res.data.access_token || res.data.token);
-        localStorage.setItem("userId", res.data.user.id);
-        localStorage.setItem("username", res.data.user.username);
-        localStorage.setItem("email", res.data.user.email);
-        navigate("/dashboard");
-        window.setTimeout(() => window.location.reload(), 50);
+        setErrors({ submit: "OTP verification is required before login." });
         return;
       }
 
       if (res.data?.existing_account) {
-        setErrors({ submit: res.data?.message || "Account already exists. Please login." });
+        setErrors({ submit: res.data?.message || "Account already exists. Redirecting to login..." });
+        window.setTimeout(() => navigate("/login"), 800);
         return;
       }
 
