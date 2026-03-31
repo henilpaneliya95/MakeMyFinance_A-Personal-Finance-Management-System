@@ -267,22 +267,25 @@ CORS_ALLOWED_ORIGINS = _csv_env("CORS_ALLOWED_ORIGINS")
 CSRF_TRUSTED_ORIGINS = _csv_env("CSRF_TRUSTED_ORIGINS")
 CORS_ALLOWED_ORIGIN_REGEXES = _csv_env("CORS_ALLOWED_ORIGIN_REGEXES")
 
-if not DEBUG:
-    default_prod_origins = [
-        "https://www.makemyfinance.online",
-        "https://makemyfinance.online",
-        "https://make-my-finance-a-personal-finance.vercel.app",
-    ]
-    for origin in default_prod_origins:
-        if origin not in CORS_ALLOWED_ORIGINS:
-            CORS_ALLOWED_ORIGINS.append(origin)
-        if origin not in CSRF_TRUSTED_ORIGINS:
-            CSRF_TRUSTED_ORIGINS.append(origin)
+default_prod_origins = [
+    "https://www.makemyfinance.online",
+    "https://makemyfinance.online",
+    "https://make-my-finance-a-personal-finance.vercel.app",
+]
+for origin in default_prod_origins:
+    if origin not in CORS_ALLOWED_ORIGINS:
+        CORS_ALLOWED_ORIGINS.append(origin)
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
-    default_prod_hosts = ["www.makemyfinance.online", "makemyfinance.online"]
-    for host in default_prod_hosts:
-        if host not in ALLOWED_HOSTS:
-            ALLOWED_HOSTS.append(host)
+default_prod_hosts = [
+    "www.makemyfinance.online",
+    "makemyfinance.online",
+    "makemyfinance-a-personal-finance.onrender.com",
+]
+for host in default_prod_hosts:
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
 
 render_external_url = os.getenv("RENDER_EXTERNAL_URL", "").strip()
 if render_external_url:
@@ -349,6 +352,7 @@ EMAIL_BACKEND = os.getenv(
 EMAIL_HOST = SMTP_HOST
 EMAIL_PORT = SMTP_PORT
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'true').lower() == 'true'
+EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', os.getenv('SMTP_TIMEOUT', '8')))
 EMAIL_HOST_USER = SMTP_USER
 EMAIL_HOST_PASSWORD = SMTP_PASSWORD
 DEFAULT_FROM_EMAIL = SMTP_FROM_EMAIL

@@ -60,7 +60,7 @@ class RegisterWithOTPView(APIView):
             status_code = (
                 status.HTTP_409_CONFLICT
                 if response_message.startswith("An account with this email")
-                else status.HTTP_500_INTERNAL_SERVER_ERROR
+                else status.HTTP_503_SERVICE_UNAVAILABLE
             )
             return Response({"message": response_message}, status=status_code)
 

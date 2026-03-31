@@ -47,6 +47,11 @@ def send_otp_email(recipient_email, otp_code, purpose, expiry_minutes):
     )
     message.attach_alternative(html_content, "text/html")
 
+    # In production, fail fast if SMTP is not configured to avoid request timeouts.
+    if not getattr(settings, "DEBUG", False):
+        if not getattr(settings, "EMAIL_HOST_USER", "") or not getattr(settings, "EMAIL_HOST_PASSWORD", ""):
+            return False, "Email service is not configured on the server."
+
     try:
         message.send(fail_silently=False)
         return True, None
