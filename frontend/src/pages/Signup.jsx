@@ -69,6 +69,14 @@ const Signup = () => {
         password: form.password,
       };
 
+      const otpStatusRes = await axios.get(`${API_BASE}/auth/otp-delivery-status/`);
+      if (!otpStatusRes.data?.otp_available) {
+        setErrors({
+          submit: otpStatusRes.data?.message || "OTP service is currently unavailable. Please try again shortly.",
+        });
+        return;
+      }
+
       const res = await axios.post(`${API_BASE}/auth/register/`, payload);
 
       if (res.data?.requires_otp) {

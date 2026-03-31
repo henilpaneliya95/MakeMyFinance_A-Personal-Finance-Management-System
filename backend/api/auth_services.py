@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import secrets
+import socket
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -54,6 +55,33 @@ def enforce_rate_limit(ip_address, email, purpose):
     ip_ok = _check_rate_limit(f"ip:{purpose}", ip_address or "unknown", ip_max, window_seconds)
     email_ok = _check_rate_limit(f"email:{purpose}", _normalize_email(email), email_max, window_seconds)
     return ip_ok and email_ok
+
+
+def get_otp_delivery_status():
+    smtp_host = getattr(settings, "EMAIL_HOST", "")
+    smtp_port = int(getattr(settings, "EMAIL_PORT", 0) or 0)
+    smtp_user = getattr(settings, "EMAIL_HOST_USER", "")
+    smtp_password = getattr(settings, "EMAIL_HOST_PASSWORD", "")
+
+    if not smtp_host or not smtp_port:
+        return False, "OTP service is not configured."
+
+    if not smtp_user or not smtp_password:
+        return False, "OTP service credentials are missing."
+
+    cache_key = "auth:otp-delivery:status"
+    cached = cache.get(cache_key)
+    if isinstance(cached, tuple) and len(cached) == 2:
+        return cached
+
+    try:
+        with socket.create_connection((smtp_host, smtp_port), timeout=3):
+            result = (True, "OTP service is available.")
+    except OSError:
+        result = (False, "OTP service is currently unavailable. Please try again in a moment.")
+
+    cache.set(cache_key, result, timeout=30)
+    return result
 
 
 def _create_otp(identifier, purpose):

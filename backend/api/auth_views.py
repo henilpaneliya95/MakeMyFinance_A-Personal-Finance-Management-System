@@ -17,6 +17,7 @@ from .auth_serializers import (
 )
 from .auth_services import (
     enforce_rate_limit,
+    get_otp_delivery_status,
     issue_access_token,
     request_login,
     request_password_reset,
@@ -25,6 +26,20 @@ from .auth_services import (
     verify_otp,
 )
 from .models import User
+
+
+class OTPDeliveryStatusView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        available, message = get_otp_delivery_status()
+        return Response(
+            {
+                "otp_available": available,
+                "message": message,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class RegisterWithOTPView(APIView):

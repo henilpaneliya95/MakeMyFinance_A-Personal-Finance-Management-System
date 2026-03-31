@@ -76,6 +76,7 @@ from .views import (
 )
 from .auth_views import (
     RegisterWithOTPView,
+    OTPDeliveryStatusView,
     VerifyOTPView,
     LoginWithOTPView,
     VerifyLoginOTPView,
@@ -98,6 +99,7 @@ urlpatterns = [
     path('users/login/', LoginView.as_view(), name='user-login'),     # Login and get JWT token
 
     # New auth endpoints with /auth/ prefix
+    path('auth/otp-delivery-status/', OTPDeliveryStatusView.as_view(), name='auth-otp-delivery-status'),
     path('auth/register/', RegisterWithOTPView.as_view(), name='auth-register'),
     path('auth/verify-otp/', VerifyOTPView.as_view(), name='auth-verify-otp'),
     path('auth/login/', LoginWithOTPView.as_view(), name='auth-login'),
