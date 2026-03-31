@@ -6,7 +6,7 @@
 - Frontend: React + Vite (`frontend`)
 - Backend: Django REST Framework + MongoEngine (`backend`)
 - Database: MongoDB (Atlas via MongoEngine for app documents), SQLite for Django internal apps
-- Auth strategy: JWT access token for API auth, with OTP verification flows for email verification, optional login 2FA, and password reset
+- Auth strategy: JWT access token for API auth, with OTP verification flows for email verification, mandatory login OTP 2FA, and password reset
 
 ### Why this design fits your codebase
 
@@ -113,22 +113,6 @@ Base: `/api/auth`
 {
   "email": "demo@example.com",
   "password": "StrongPass123!"
-}
-```
-- Success (no login OTP required):
-```json
-{
-  "message": "Login successful.",
-  "requires_otp": false,
-  "access_token": "<jwt>",
-  "token": "<jwt>",
-  "user": {
-    "id": "...",
-    "username": "demo",
-    "email": "demo@example.com",
-    "role": "user",
-    "email_verified": true
-  }
 }
 ```
 - Success (login OTP required):
@@ -341,13 +325,14 @@ Coverage includes:
 - Forgot password + reset password
 - OTP attempt limit behavior
 - Token generation basic validation
+- Mandatory login OTP before token issuance
 
 Command:
 ```bash
 backend/.venv/Scripts/python.exe backend/manage.py test api.test_auth_otp -v 2
 ```
 Expected result:
-- `Ran 4 tests ... OK`
+- `Ran 5 tests ... OK`
 
 ### Frontend tests added
 
@@ -371,7 +356,7 @@ Expected result:
 
 ## 10. Recommended Production Next Steps
 
-1. Enable `AUTH_REQUIRE_LOGIN_OTP=True` if mandatory login 2FA is desired.
+1. Keep `AUTH_REQUIRE_LOGIN_OTP=True` in production so login always requires OTP.
 2. Add refresh token rotation + blacklist for strict logout security.
 3. Move rate limiting to Redis cache backend for multi-instance deployments.
 4. Add centralized audit logging for auth events (OTP requests, verification, lockouts).
