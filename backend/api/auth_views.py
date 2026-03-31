@@ -34,9 +34,11 @@ class OTPDeliveryStatusView(APIView):
 
     def get(self, request):
         available, message = get_otp_delivery_status()
+        otp_preview_enabled = bool(getattr(settings, "AUTH_ALLOW_OTP_PREVIEW", False))
         return Response(
             {
                 "otp_available": available,
+                "otp_preview_enabled": otp_preview_enabled,
                 "message": message,
             },
             status=status.HTTP_200_OK,

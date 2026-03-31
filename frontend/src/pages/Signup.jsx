@@ -70,7 +70,9 @@ const Signup = () => {
       };
 
       const otpStatusRes = await axios.get(`${API_BASE}/auth/otp-delivery-status/`);
-      if (!otpStatusRes.data?.otp_available) {
+      const otpAvailable = Boolean(otpStatusRes.data?.otp_available);
+      const otpPreviewEnabled = Boolean(otpStatusRes.data?.otp_preview_enabled);
+      if (!otpAvailable && !otpPreviewEnabled) {
         setErrors({
           submit: otpStatusRes.data?.message || "OTP service is currently unavailable. Please try again shortly.",
         });
