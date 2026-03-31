@@ -51,6 +51,9 @@ const OtpVerification = () => {
     if (pendingRegistration?.email) {
       setEmail(pendingRegistration.email);
       setPurpose("registration");
+      if (pendingRegistration.otpPreview) {
+        setSuccess(`Temporary OTP: ${pendingRegistration.otpPreview}`);
+      }
       return;
     }
 

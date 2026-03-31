@@ -22,3 +22,5 @@ services:
         value: "8"
       - key: AUTH_REQUIRE_LOGIN_OTP
         value: "True"
+      - key: AUTH_ALLOW_OTP_PREVIEW
+        value: "True"

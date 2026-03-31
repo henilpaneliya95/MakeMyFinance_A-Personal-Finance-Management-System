@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from django.conf import settings
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -58,7 +59,7 @@ class RegisterWithOTPView(APIView):
             )
 
         try:
-            sent, error_msg, user = request_registration_otp(
+            sent, error_msg, user, otp_preview = request_registration_otp(
                 username=serializer.validated_data["username"],
                 email=email,
                 password=serializer.validated_data["password"],
@@ -72,6 +73,19 @@ class RegisterWithOTPView(APIView):
 
         if not sent:
             response_message = error_msg or "Unable to send OTP. Please try again."
+
+            if bool(getattr(settings, "AUTH_ALLOW_OTP_PREVIEW", False)) and otp_preview and user:
+                return Response(
+                    {
+                        "message": "OTP email unavailable. Using temporary OTP preview mode.",
+                        "requires_otp": True,
+                        "purpose": "registration",
+                        "identifier": user.email,
+                        "otp_preview": otp_preview,
+                    },
+                    status=status.HTTP_201_CREATED,
+                )
+
             if response_message.startswith("An account with this email"):
                 return Response(
                     {

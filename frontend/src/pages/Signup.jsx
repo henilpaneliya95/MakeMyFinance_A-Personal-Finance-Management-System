@@ -83,6 +83,7 @@ const Signup = () => {
         savePendingFlow("registration", {
           email: payload.email,
           purpose: "registration",
+          otpPreview: res.data?.otp_preview || null,
           createdAt: Date.now(),
         });
         navigate(`/verify-otp?purpose=registration&email=${encodeURIComponent(payload.email)}`);

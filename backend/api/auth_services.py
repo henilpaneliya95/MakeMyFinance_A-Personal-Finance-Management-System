@@ -122,13 +122,15 @@ def request_registration_otp(username, email, password, role="user"):
     existing = User.objects(email__iexact=email).first()
 
     if existing and existing.email_verified:
-        return False, "An account with this email already exists.", None
+        return False, "An account with this email already exists.", None, None
 
     otp_code, expiry_minutes = _create_otp(email, "registration")
     sent, error_msg = send_otp_email(email, otp_code, "registration", expiry_minutes)
 
-    if not sent:
-        return False, error_msg, None
+    allow_preview = bool(getattr(settings, "AUTH_ALLOW_OTP_PREVIEW", False))
+
+    if not sent and not allow_preview:
+        return False, error_msg, None, None
 
     if existing:
         existing.username = username.strip()
@@ -150,7 +152,7 @@ def request_registration_otp(username, email, password, role="user"):
         user.set_password(password)
         user.save()
 
-    return sent, error_msg, user
+    return sent, error_msg, user, (otp_code if not sent and allow_preview else None)
 
 
 def verify_otp(identifier, purpose, otp_input):

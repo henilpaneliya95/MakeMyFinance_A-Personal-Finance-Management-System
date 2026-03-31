@@ -280,3 +280,22 @@ class AuthLoginOTPRequiredTests(TestCase):
         self.assertEqual(login_res.status_code, 200)
         self.assertTrue(login_res.data.get("auth_error"))
         self.assertFalse(login_res.data.get("requires_otp"))
+
+    @override_settings(AUTH_ALLOW_OTP_PREVIEW=True)
+    @patch("api.auth_services.send_otp_email", return_value=(False, "SMTP down"))
+    @patch("api.auth_services._generate_numeric_otp", return_value="112233")
+    def test_registration_returns_otp_preview_when_preview_mode_enabled(self, _otp_mock, _mail_mock):
+        register_res = self.client.post(
+            "/api/auth/register/",
+            {
+                "username": "previewuser",
+                "email": "previewuser@example.com",
+                "password": "VeryStrongPass123!",
+            },
+            format="json",
+        )
+
+        self.assertEqual(register_res.status_code, 201)
+        self.assertTrue(register_res.data.get("requires_otp"))
+        self.assertEqual(register_res.data.get("otp_preview"), "112233")
+        self.assertEqual(User.objects(email__iexact="previewuser@example.com").count(), 1)
