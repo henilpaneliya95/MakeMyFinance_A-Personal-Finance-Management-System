@@ -90,8 +90,9 @@ class RegisterWithOTPView(APIView):
                     {
                         "message": "OTP service is currently unavailable. Please try again in a moment.",
                         "requires_otp": False,
+                        "otp_unavailable": True,
                     },
-                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    status=status.HTTP_200_OK,
                 )
 
             return Response({"message": response_message}, status=status.HTTP_503_SERVICE_UNAVAILABLE)

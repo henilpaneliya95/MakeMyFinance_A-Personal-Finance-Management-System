@@ -89,6 +89,11 @@ const Signup = () => {
         return;
       }
 
+      if (res.data?.otp_unavailable) {
+        setErrors({ submit: res.data?.message || "OTP service is currently unavailable. Please try again shortly." });
+        return;
+      }
+
       if (res.data?.access_token && res.data?.user) {
         setErrors({ submit: "OTP verification is required before login." });
         return;
