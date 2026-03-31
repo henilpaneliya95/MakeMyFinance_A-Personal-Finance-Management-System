@@ -57,12 +57,35 @@ class RegisterWithOTPView(APIView):
 
         if not sent:
             response_message = error_msg or "Unable to send OTP. Please try again."
-            status_code = (
-                status.HTTP_409_CONFLICT
-                if response_message.startswith("An account with this email")
-                else status.HTTP_503_SERVICE_UNAVAILABLE
-            )
-            return Response({"message": response_message}, status=status_code)
+            if response_message.startswith("An account with this email"):
+                return Response({"message": response_message}, status=status.HTTP_409_CONFLICT)
+
+            # If SMTP is unavailable in production, allow registration to proceed
+            # to avoid hard signup outages caused by transient email infra issues.
+            lowered = response_message.lower()
+            if "network is unreachable" in lowered or "email service is not configured" in lowered:
+                user.email_verified = True
+                user.updated_at = datetime.now(timezone.utc)
+                user.save()
+                token = issue_access_token(user)
+                return Response(
+                    {
+                        "message": "Account created. OTP service is temporarily unavailable.",
+                        "requires_otp": False,
+                        "access_token": token,
+                        "token": token,
+                        "user": {
+                            "id": str(user.id),
+                            "username": user.username,
+                            "email": user.email,
+                            "role": user.role,
+                            "email_verified": user.email_verified,
+                        },
+                    },
+                    status=status.HTTP_201_CREATED,
+                )
+
+            return Response({"message": response_message}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         return Response(
             {

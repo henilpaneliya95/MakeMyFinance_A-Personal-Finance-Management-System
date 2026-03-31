@@ -71,6 +71,16 @@ const Signup = () => {
         return;
       }
 
+      if (res.data?.access_token && res.data?.user) {
+        localStorage.setItem("accessToken", res.data.access_token || res.data.token);
+        localStorage.setItem("userId", res.data.user.id);
+        localStorage.setItem("username", res.data.user.username);
+        localStorage.setItem("email", res.data.user.email);
+        navigate("/dashboard");
+        window.setTimeout(() => window.location.reload(), 50);
+        return;
+      }
+
       setErrors({ submit: "Unexpected response from server." });
     } catch (err) {
       setErrors({
