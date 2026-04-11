@@ -216,21 +216,31 @@ DATABASES = {
 # -----------------------------
 # ✅ MongoDB Connection
 # -----------------------------
-username = os.getenv("MONGODB_USER")
-password = quote_plus(os.getenv("MONGODB_PASS"))  # encode special chars (@, #, :)
-host = os.getenv("MONGODB_HOST")
-db_name = os.getenv("MONGODB_DATABASE_NAME")
+username = (os.getenv("MONGODB_USER") or "").strip()
+raw_password = os.getenv("MONGODB_PASS") or ""
+password = quote_plus(raw_password)  # encode special chars (@, #, :)
+host = (os.getenv("MONGODB_HOST") or "").strip()
+db_name = (os.getenv("MONGODB_DATABASE_NAME") or "").strip()
 
-MONGODB_URI = f"mongodb+srv://{username}:{password}@{host}/{db_name}?retryWrites=true&w=majority&appName=MakeMy Finance"
-
-try:
-    connect(
-        db=db_name,
-        host=MONGODB_URI
+if username and raw_password and host and db_name:
+    MONGODB_URI = (
+        f"mongodb+srv://{username}:{password}@{host}/{db_name}"
+        "?retryWrites=true&w=majority&appName=MakeMyFinance"
     )
-    print("Connected to MongoDB Atlas successfully")
-except Exception as e:
-    print(f"Failed to connect to MongoDB Atlas: {e}")
+    try:
+        connect(
+            db=db_name,
+            host=MONGODB_URI
+        )
+        print("Connected to MongoDB Atlas successfully")
+    except Exception as e:
+        print(f"Failed to connect to MongoDB Atlas: {e}")
+else:
+    print(
+        "MongoDB credentials not fully configured "
+        "(MONGODB_USER, MONGODB_PASS, MONGODB_HOST, MONGODB_DATABASE_NAME). "
+        "Using SQLite only."
+    )
 # -----------------------------
 # ✅ Password Validation
 # -----------------------------
